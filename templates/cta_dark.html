@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1080, height=1080">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 1080px;
+    height: 1080px;
+    overflow: hidden;
+    font-family: 'Heebo', 'Noto Color Emoji', sans-serif;
+    direction: rtl;
+    text-align: center;
+    background: linear-gradient(145deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px;
+    position: relative;
+  }
+
+  .accent-top {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, #e94560, #f5a623, #e94560);
+  }
+
+  .accent-bottom {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, #e94560, #f5a623, #e94560);
+  }
+
+  /* Big glow behind CTA block */
+  .center-glow {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(233,69,96,0.08) 0%, transparent 65%);
+    border-radius: 50%;
+  }
+
+  /* Decorative thin horizontal lines */
+  .line-top {
+    position: absolute;
+    top: 220px; left: 80px; right: 80px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  }
+
+  .line-bottom {
+    position: absolute;
+    bottom: 220px; left: 80px; right: 80px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  }
+
+  .cta-emoji {
+    font-size: 80px;
+    margin-bottom: 28px;
+    line-height: 1;
+    font-family: 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif;
+  }
+
+  .cta-headline {
+    font-size: {{ headline_size | default('64px') }};
+    font-weight: 900;
+    color: #ffffff;
+    text-align: center;
+    line-height: 1.2;
+    margin-bottom: 24px;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.4);
+  }
+
+  .cta-sub {
+    font-size: {{ sub_size | default('30px') }};
+    font-weight: 300;
+    color: rgba(255,255,255,0.7);
+    text-align: center;
+    line-height: 1.5;
+    margin-bottom: 48px;
+    max-width: 750px;
+  }
+
+  /* CTA pill button (visual only) */
+  .cta-button {
+    display: inline-block;
+    background: linear-gradient(135deg, #e94560, #c0392b);
+    color: #fff;
+    font-size: 30px;
+    font-weight: 700;
+    padding: 18px 52px;
+    border-radius: 60px;
+    margin-bottom: 40px;
+    box-shadow: 0 8px 30px rgba(233,69,96,0.5);
+    letter-spacing: 0.5px;
+  }
+
+  /* Handle big */
+  .handle-big {
+    font-size: 34px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.5);
+    direction: ltr;
+    letter-spacing: 1px;
+  }
+
+  .handle-big span {
+    color: #e94560;
+  }
+
+  .slide-number {
+    position: absolute;
+    bottom: 36px;
+    left: 50px;
+    font-size: 18px;
+    font-weight: 300;
+    color: rgba(255,255,255,0.3);
+  }
+
+  .handle-small {
+    position: absolute;
+    bottom: 30px;
+    right: 50px;
+    font-size: 20px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.4);
+    direction: ltr;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="accent-top"></div>
+  <div class="accent-bottom"></div>
+  <div class="center-glow"></div>
+  <div class="line-top"></div>
+  <div class="line-bottom"></div>
+
+  {% if emoji %}
+  <div class="cta-emoji">{{ emoji }}</div>
+  {% endif %}
+
+  <h2 class="cta-headline">{{ headline }}</h2>
+
+  {% if subtext %}
+  <p class="cta-sub">{{ subtext }}</p>
+  {% endif %}
+
+  {% if button_text %}
+  <div class="cta-button">{{ button_text }}</div>
+  {% endif %}
+
+  <div class="handle-big"><span>@</span>bennyfarber</div>
+
+  <span class="slide-number">{{ slide_num }}/{{ total_slides }}</span>
+  <span class="handle-small">{{ handle | default("@bennyfarber") }}</span>
+</div>
+</body>
+</html>
