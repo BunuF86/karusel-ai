@@ -35,9 +35,11 @@ export async function POST(req: NextRequest) {
     const inputFile = path.join(tmpDir, 'input.json')
 
     // Write input JSON
+    const handle = body.handle || '@bennyfarber'
     const inputData: Record<string, unknown> = {
       title,
       theme,
+      handle,
       slides: body.slides,
     }
     if (avatar) {

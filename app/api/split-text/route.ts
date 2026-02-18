@@ -155,7 +155,7 @@ async function aiSplit(text: string, mode: string): Promise<SlideData[]> {
   - אימוג'י ב-cover שמתאים לנושא`
 
   const userPrompt = mode === 'ai'
-    ? `כתוב קרוסלה שלמה ומפורטת על הנושא: "${text}". צור לפחות 4 שקופיות תוכן עם נקודות מעשיות.`
+    ? `כתוב קרוסלה שלמה ומפורטת על הנושא: "${text}". צור לפחות 4 שקופיות תוכן עם נקודות מעשיות. חשוב: הכותרת בשקופית הראשונה (cover) חייבת להיות בדיוק הטקסט שהמשתמש כתב: "${text}"`
     : `פרק את הטקסט הבא לקרוסלה מקצועית:\n\n${text}`
 
   const response = await fetch(apiUrl, {
