@@ -253,7 +253,7 @@ export default function CreatePage() {
 
             {/* Mode toggle */}
             <div className="flex gap-1 p-1 bg-white/5 rounded-full w-fit mb-6 border border-white/8">
-              <button
+              <button type="button"
                 onClick={() => setMode('text')}
                 className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
                   mode === 'text'
@@ -263,7 +263,7 @@ export default function CreatePage() {
               >
                 טקסט מוכן
               </button>
-              <button
+              <button type="button"
                 onClick={() => setMode('ai')}
                 className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
                   mode === 'ai'
@@ -319,7 +319,7 @@ export default function CreatePage() {
               </div>
             )}
 
-            <button
+            <button type="button"
               onClick={splitText}
               disabled={isSplitting || (mode === 'text' ? !rawText.trim() : !aiTopic.trim())}
               className="mt-8 w-full bg-[#F97316] hover:bg-[#EA580C] text-white font-bold py-3.5 rounded-full text-sm disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
@@ -344,7 +344,7 @@ export default function CreatePage() {
                 <h1 className="text-2xl font-bold text-white mb-1">בחרו סגנון</h1>
                 <p className="text-white/40 text-sm">{slides.length} שקופיות</p>
               </div>
-              <button
+              <button type="button"
                 onClick={() => setStep(1)}
                 className="text-white/30 hover:text-white/60 text-sm transition-colors"
               >
@@ -357,7 +357,7 @@ export default function CreatePage() {
               <label className="block text-xs font-medium text-white/40 mb-3">ערכת צבעים</label>
               <div className="grid grid-cols-5 gap-2">
                 {THEMES.map(theme => (
-                  <button
+                  <button type="button"
                     key={theme.id}
                     onClick={() => setSelectedTheme(theme.id)}
                     title={theme.name}
@@ -423,7 +423,7 @@ export default function CreatePage() {
                   { id: 'image', label: 'תמונה / לוגו', icon: '🖼' },
                   { id: 'emoji', label: 'אימוג׳י', icon: '😊' },
                 ] as { id: VisualType; label: string; icon: string }[]).map(opt => (
-                  <button
+                  <button type="button"
                     key={opt.id}
                     onClick={() => setVisualType(opt.id)}
                     className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium transition-all border flex-1 justify-center ${
@@ -488,7 +488,7 @@ export default function CreatePage() {
                           { id: 'bottom', label: 'למטה' },
                           { id: 'side', label: 'בצד' },
                         ] as { id: AvatarPlacement; label: string }[]).map(p => (
-                          <button
+                          <button type="button"
                             key={p.id}
                             onClick={() => setAvatarPlacement(p.id)}
                             className={`flex-1 py-2 rounded-lg text-xs font-medium border transition-all ${
@@ -511,7 +511,7 @@ export default function CreatePage() {
                 <div>
                   <div className="grid grid-cols-8 gap-1.5 p-3 bg-white/4 border border-white/8 rounded-xl">
                     {QUICK_EMOJIS.map(emoji => (
-                      <button
+                      <button type="button"
                         key={emoji}
                         onClick={() => setSelectedEmoji(emoji)}
                         className={`w-8 h-8 flex items-center justify-center text-lg rounded-lg transition-all ${
@@ -552,7 +552,7 @@ export default function CreatePage() {
               </div>
             )}
 
-            <button
+            <button type="button"
               onClick={generate}
               disabled={isGenerating}
               className="w-full bg-[#F97316] hover:bg-[#EA580C] text-white font-bold py-3.5 rounded-full text-sm disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
@@ -610,13 +610,13 @@ export default function CreatePage() {
             </div>
 
             <div className="flex gap-3">
-              <button
+              <button type="button"
                 onClick={downloadAll}
                 className="flex-1 bg-[#F97316] hover:bg-[#EA580C] text-white font-bold py-3.5 rounded-full text-sm transition-colors"
               >
                 הורד הכל
               </button>
-              <button
+              <button type="button"
                 onClick={() => {
                   setStep(1)
                   setResult(null)
