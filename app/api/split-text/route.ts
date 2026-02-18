@@ -154,7 +154,8 @@ async function aiSplit(text: string, mode: string): Promise<SlideData[]> {
   - התוכן חייב להיות מעניין, פרקטי ושימושי — לא גנרי
   - אם קיבלת נושא קצר — תמציא תוכן איכותי ורלוונטי על הנושא
   - אימוג'י ב-cover שמתאים לנושא
-  - טקסט הגוף (body) של כל שקופית: מקסימום 3 שורות / 40 מילים. קצר וקולע.`
+  - טקסט הגוף (body) של כל שקופית: מקסימום 3 שורות / 40 מילים. קצר וקולע.
+  - אסור שאלות בטקסט הגוף! רק עובדות וטענות. לא "האם אתה...?" — רק משפטי חיווי.`
 
   const userPrompt = mode === 'ai'
     ? `כתוב קרוסלה שלמה ומפורטת על הנושא: "${text}". צור לפחות 4 שקופיות תוכן עם נקודות מעשיות. חשוב: הכותרת בשקופית הראשונה (cover) חייבת להיות בדיוק הטקסט שהמשתמש כתב: "${text}"`
@@ -201,11 +202,15 @@ async function aiSplit(text: string, mode: string): Promise<SlideData[]> {
   }
   // Post-process: enforce min 2 words per line in headlines and body
   const slides = (parsed.slides as SlideData[]).map(s => {
-    // Body text: rewrite sentences to avoid orphan words
-    // Split body into ~equal length lines to prevent CSS from leaving a single word
     if (s.body) {
       // Remove line breaks — let CSS handle wrapping
       s.body = s.body.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim()
+      // Remove question sentences from body
+      s.body = s.body.split(/[.?!]/).filter(sent => {
+        const t = sent.trim()
+        return t.length > 0 && !t.includes('האם') && !t.endsWith('?') && !t.startsWith('מה ') && !t.startsWith('איך ')
+      }).join('. ').trim()
+      if (s.body && !s.body.endsWith('.')) s.body += '.'
     }
     // Fix body text — ensure no sentence ends with a single short word
     // Also limit body to ~3 sentences to prevent overflow
