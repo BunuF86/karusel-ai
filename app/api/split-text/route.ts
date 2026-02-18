@@ -112,44 +112,59 @@ function ruleBasedSplit(text: string, mode: string): SlideData[] {
   return slides
 }
 
-// OpenAI-powered splitter
+// AI-powered splitter (Groq or OpenAI)
 async function aiSplit(text: string, mode: string): Promise<SlideData[]> {
-  const apiKey = process.env.OPENAI_API_KEY
-  if (!apiKey) {
-    console.log('[split-text] No OpenAI key, using rule-based splitter')
+  // Try Groq first (free), then OpenAI
+  const groqKey = process.env.GROQ_API_KEY
+  const openaiKey = process.env.OPENAI_API_KEY
+  
+  if (!groqKey && !openaiKey) {
+    console.log('[split-text] No AI key, using rule-based splitter')
     return ruleBasedSplit(text, mode)
   }
 
-  const systemPrompt = `אתה מומחה ליצירת קרוסלות לאינסטגרם. המשימה שלך: לקחת טקסט ולהפוך אותו לקרוסלה.
+  const apiUrl = groqKey 
+    ? 'https://api.groq.com/openai/v1/chat/completions'
+    : 'https://api.openai.com/v1/chat/completions'
+  const apiKey = groqKey || openaiKey
+  const model = groqKey ? 'llama-3.3-70b-versatile' : 'gpt-4o-mini'
+
+  console.log(`[split-text] Using ${groqKey ? 'Groq' : 'OpenAI'} with ${model}`)
+
+  const systemPrompt = `אתה מומחה ליצירת קרוסלות לאינסטגרם בעברית. המשימה שלך: לקחת טקסט או נושא ולהפוך אותו לקרוסלה מקצועית.
   
   החזר JSON בלבד, ללא הסברים נוספים, בפורמט הבא:
   {
     "slides": [
-      {"type": "cover", "headline": "כותרת ראשית קצרה", "subtitle": "כיתוב משנה", "emoji": "🔥"},
-      {"type": "content", "headline": "כותרת", "item_number": "1", "bullets": ["נקודה א", "נקודה ב", "נקודה ג"]},
-      {"type": "cta", "headline": "קריאה לפעולה", "subtext": "טקסט קצר", "button_text": "עקבו", "emoji": "👇"}
+      {"type": "cover", "headline": "כותרת ראשית קצרה ומושכת", "subtitle": "", "emoji": "🔥"},
+      {"type": "content", "headline": "כותרת שקופית", "item_number": "1", "bullets": ["נקודה מעניינת ראשונה", "נקודה שנייה עם ערך", "נקודה שלישית חשובה"]},
+      {"type": "cta", "headline": "קריאה לפעולה", "subtext": "טקסט משכנע קצר", "button_text": "עקבו", "emoji": "👇"}
     ]
   }
   
-  כללים:
-  - כותרות: קצרות, מושכות, עד 50 תווים
-  - כל שקופית תוכן: 2-4 נקודות (bullets)
+  כללים חשובים:
+  - כותרת cover: קצרה, מושכת, עד 40 תווים, בלי subtitle
+  - כל שקופית תוכן: כותרת חזקה + 2-3 נקודות (bullets) עם תוכן אמיתי ושימושי
+  - 4-6 שקופיות תוכן (לא פחות מ-3!)
   - מקסימום 8 שקופיות כולל cover ו-CTA
-  - שפה: עברית, RTL
-  - אל תמציא עובדות — השתמש רק במה שיש בטקסט`
+  - שפה: עברית טבעית, לא פורמלית מדי
+  - כותרות: בלי מקף בהתחלה, בלי מילה בודדת בשורה
+  - התוכן חייב להיות מעניין, פרקטי ושימושי — לא גנרי
+  - אם קיבלת נושא קצר — תמציא תוכן איכותי ורלוונטי על הנושא
+  - אימוג'י ב-cover שמתאים לנושא`
 
   const userPrompt = mode === 'ai'
-    ? `כתוב קרוסלה שלמה על הנושא: "${text}"`
-    : `פרק את הטקסט הבא לקרוסלה:\n\n${text}`
+    ? `כתוב קרוסלה שלמה ומפורטת על הנושא: "${text}". צור לפחות 4 שקופיות תוכן עם נקודות מעשיות.`
+    : `פרק את הטקסט הבא לקרוסלה מקצועית:\n\n${text}`
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+  const response = await fetch(apiUrl, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'gpt-4o-mini',
+      model,
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },
