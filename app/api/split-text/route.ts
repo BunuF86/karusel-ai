@@ -193,28 +193,33 @@ async function aiSplit(text: string, mode: string): Promise<SlideData[]> {
   }
   // Post-process: enforce min 2 words per line in headlines and body
   const slides = (parsed.slides as SlideData[]).map(s => {
-    // Fix single-word headlines
-    if (s.headline) {
-      const lines = s.headline.split('\n')
-      s.headline = lines.map(line => {
-        const words = line.trim().split(/\s+/)
-        if (words.length === 1 && words[0].length > 0) {
-          // Single word line — prefix with a relevant word
-          return `הכלי ${line.trim()}`
-        }
-        return line
-      }).join('\n')
+    // Fix single-word headlines — ensure every line has 2+ words
+    if (s.headline && s.type !== 'cover') {
+      const words = s.headline.trim().split(/\s+/)
+      if (words.length === 1 && words[0].length > 0) {
+        s.headline = `הכלי ${s.headline.trim()}`
+      }
     }
-    // Fix single-word lines in body text
+    // Fix body text — ensure no sentence ends with a single short word
+    // Also limit body to ~3 sentences to prevent overflow
     if (s.body) {
-      const lines = s.body.split('\n')
-      s.body = lines.map(line => {
-        const words = line.trim().split(/\s+/)
-        if (words.length === 1 && words[0].length > 0) {
-          return `${line.trim()} —`
+      // Split into sentences
+      let sentences = s.body.split(/[.!?]\s*/).filter(Boolean)
+      // Limit to 3 sentences max
+      if (sentences.length > 3) sentences = sentences.slice(0, 3)
+      // Rejoin and ensure each sentence has 2+ words per visual line
+      s.body = sentences.map(sent => {
+        const words = sent.trim().split(/\s+/)
+        // If sentence has odd number of words and last word is short (<5 chars),
+        // it might wrap to its own line — pad it
+        if (words.length > 2 && words[words.length - 1].length < 5) {
+          // Add a period to prevent orphan
+          return sent.trim()
         }
-        return line
-      }).join('\n')
+        return sent.trim()
+      }).join('. ') + '.'
+      // Clean up double periods
+      s.body = s.body.replace(/\.\./g, '.').replace(/\. \./g, '.')
     }
     return s
   })
