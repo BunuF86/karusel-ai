@@ -149,7 +149,7 @@ async function aiSplit(text: string, mode: string): Promise<SlideData[]> {
   - 4-6 שקופיות תוכן (לא פחות מ-3!)
   - מקסימום 8 שקופיות כולל cover ו-CTA
   - שפה: עברית טבעית, לא פורמלית מדי
-  - כותרות: בלי מקף בהתחלה, בלי מילה בודדת בשורה
+  - כותרות: בלי מקף בהתחלה. כלל קריטי: אסור מילה בודדת בשורה! מינימום 2 מילים בכל שורה תמיד. אם הכותרת היא מילה אחת — הוסף מילה נוספת (לדוגמה: במקום "ChatGPT" תכתוב "הכלי ChatGPT" או "כלי ChatGPT")
   - התוכן חייב להיות מעניין, פרקטי ושימושי — לא גנרי
   - אם קיבלת נושא קצר — תמציא תוכן איכותי ורלוונטי על הנושא
   - אימוג'י ב-cover שמתאים לנושא`
@@ -185,7 +185,34 @@ async function aiSplit(text: string, mode: string): Promise<SlideData[]> {
   if (!content) throw new Error('Empty response from OpenAI')
 
   const parsed = JSON.parse(content)
-  return parsed.slides as SlideData[]
+  // Post-process: enforce min 2 words per line in headlines and body
+  const slides = (parsed.slides as SlideData[]).map(s => {
+    // Fix single-word headlines
+    if (s.headline) {
+      const lines = s.headline.split('\n')
+      s.headline = lines.map(line => {
+        const words = line.trim().split(/\s+/)
+        if (words.length === 1 && words[0].length > 0) {
+          // Single word line — prefix with a relevant word
+          return `הכלי ${line.trim()}`
+        }
+        return line
+      }).join('\n')
+    }
+    // Fix single-word lines in body text
+    if (s.body) {
+      const lines = s.body.split('\n')
+      s.body = lines.map(line => {
+        const words = line.trim().split(/\s+/)
+        if (words.length === 1 && words[0].length > 0) {
+          return `${line.trim()} —`
+        }
+        return line
+      }).join('\n')
+    }
+    return s
+  })
+  return slides
 }
 
 export async function POST(req: NextRequest) {
