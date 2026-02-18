@@ -6,7 +6,7 @@ interface SlideData {
   subtitle?: string
   emoji?: string
   item_number?: string
-  bullets?: string[]
+  body?: string
   subtext?: string
   button_text?: string
 }
@@ -42,19 +42,19 @@ function ruleBasedSplit(text: string, mode: string): SlideData[] {
       type: 'content',
       headline: 'נקודה ראשונה',
       item_number: '1',
-      bullets: ['הוסיפו פרט ראשון', 'הוסיפו פרט שני', 'הוסיפו פרט שלישי'],
+      body: 'הוסיפו כאן טקסט מעניין שמסביר את הנקודה הראשונה. כמה משפטים קצרים שנותנים ערך אמיתי.',
     })
     slides.push({
       type: 'content',
       headline: 'נקודה שנייה',
       item_number: '2',
-      bullets: ['הוסיפו פרט ראשון', 'הוסיפו פרט שני', 'הוסיפו פרט שלישי'],
+      body: 'הוסיפו כאן טקסט מעניין שמסביר את הנקודה השנייה. כמה משפטים קצרים שנותנים ערך אמיתי.',
     })
     slides.push({
       type: 'content',
       headline: 'נקודה שלישית',
       item_number: '3',
-      bullets: ['הוסיפו פרט ראשון', 'הוסיפו פרט שני', 'הוסיפו פרט שלישי'],
+      body: 'הוסיפו כאן טקסט מעניין שמסביר את הנקודה השלישית. כמה משפטים קצרים שנותנים ערך אמיתי.',
     })
     slides.push({
       type: 'cta',
@@ -83,19 +83,19 @@ function ruleBasedSplit(text: string, mode: string): SlideData[] {
     const dashParts = line.split(' - ')
     if (dashParts.length >= 2) {
       const headline = dashParts[0].trim()
-      const bullets = dashParts.slice(1).join(' - ').split(', ').map(b => b.trim()).filter(Boolean)
+      const bodyParts = dashParts.slice(1).join(' - ').split(', ').map(b => b.trim()).filter(Boolean)
       slides.push({
         type: 'content',
         headline,
         item_number: String(i + 1),
-        bullets,
+        body: bodyParts.join('. '),
       })
     } else {
       slides.push({
         type: 'content',
         headline: line.length > 60 ? line.slice(0, 57) + '...' : line,
         item_number: String(i + 1),
-        bullets: [],
+        body: '',
       })
     }
   })
@@ -137,14 +137,15 @@ async function aiSplit(text: string, mode: string): Promise<SlideData[]> {
   {
     "slides": [
       {"type": "cover", "headline": "כותרת ראשית קצרה ומושכת", "subtitle": "", "emoji": "🔥"},
-      {"type": "content", "headline": "כותרת שקופית", "item_number": "1", "bullets": ["נקודה מעניינת ראשונה", "נקודה שנייה עם ערך", "נקודה שלישית חשובה"]},
+      {"type": "content", "headline": "כותרת שקופית", "item_number": "1", "body": "טקסט זורם ומעניין שמסביר את הנקודה. כמה משפטים קצרים שנותנים ערך אמיתי ופרקטי."},
       {"type": "cta", "headline": "קריאה לפעולה", "subtext": "טקסט משכנע קצר", "button_text": "עקבו", "emoji": "👇"}
     ]
   }
   
   כללים חשובים:
   - כותרת cover: קצרה, מושכת, עד 40 תווים, בלי subtitle
-  - כל שקופית תוכן: כותרת חזקה + 2-3 נקודות (bullets) עם תוכן אמיתי ושימושי
+  - כל שקופית תוכן: כותרת חזקה + שדה body עם 2-3 משפטים זורמים בעברית טבעית (לא נקודות, לא רשימות!)
+  - שדה body: טקסט פסקאות רציף, מעניין, שימושי — כ-15-30 מילים לשקופית
   - 4-6 שקופיות תוכן (לא פחות מ-3!)
   - מקסימום 8 שקופיות כולל cover ו-CTA
   - שפה: עברית טבעית, לא פורמלית מדי
