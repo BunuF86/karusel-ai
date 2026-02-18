@@ -149,10 +149,12 @@ async function aiSplit(text: string, mode: string): Promise<SlideData[]> {
   - 4-6 שקופיות תוכן (לא פחות מ-3!)
   - מקסימום 8 שקופיות כולל cover ו-CTA
   - שפה: עברית טבעית, לא פורמלית מדי
-  - כותרות: בלי מקף בהתחלה. כלל קריטי: אסור מילה בודדת בשורה! מינימום 2 מילים בכל שורה תמיד. אם הכותרת היא מילה אחת — הוסף מילה נוספת (לדוגמה: במקום "ChatGPT" תכתוב "הכלי ChatGPT" או "כלי ChatGPT")
+  - כלל קריטי ביותר: אסור מילה בודדת בשורה! מינימום 2 מילים בכל שורה תמיד. זה חל על כותרות וטקסט גוף. אם כותרת היא מילה אחת — חובה להוסיף מילה (לדוגמה: "הכלי ChatGPT" במקום "ChatGPT"). גם בטקסט הגוף — כל משפט חייב להיות מספיק ארוך שלא תישאר מילה בודדת בסוף שורה. כתוב משפטים באורך 8-15 מילים.
+  - כותרות: בלי מקף בהתחלה, קצרות (3-5 מילים)
   - התוכן חייב להיות מעניין, פרקטי ושימושי — לא גנרי
   - אם קיבלת נושא קצר — תמציא תוכן איכותי ורלוונטי על הנושא
-  - אימוג'י ב-cover שמתאים לנושא`
+  - אימוג'י ב-cover שמתאים לנושא
+  - טקסט הגוף (body) של כל שקופית: מקסימום 3 שורות / 40 מילים. קצר וקולע.`
 
   const userPrompt = mode === 'ai'
     ? `כתוב קרוסלה שלמה ומפורטת על הנושא: "${text}". צור לפחות 4 שקופיות תוכן עם נקודות מעשיות. חשוב: הכותרת בשקופית הראשונה (cover) חייבת להיות בדיוק הטקסט שהמשתמש כתב: "${text}"`
@@ -185,6 +187,10 @@ async function aiSplit(text: string, mode: string): Promise<SlideData[]> {
   if (!content) throw new Error('Empty response from OpenAI')
 
   const parsed = JSON.parse(content)
+  // Force cover headline to be EXACTLY the user's original text
+  if (parsed.slides && parsed.slides.length > 0 && parsed.slides[0].type === 'cover') {
+    parsed.slides[0].headline = text
+  }
   // Post-process: enforce min 2 words per line in headlines and body
   const slides = (parsed.slides as SlideData[]).map(s => {
     // Fix single-word headlines
