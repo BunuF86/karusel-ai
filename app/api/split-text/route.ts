@@ -149,8 +149,8 @@ async function aiSplit(text: string, mode: string): Promise<SlideData[]> {
   - 4-6 שקופיות תוכן (לא פחות מ-3!)
   - מקסימום 8 שקופיות כולל cover ו-CTA
   - שפה: עברית טבעית, לא פורמלית מדי
-  - כלל קריטי ביותר: אסור מילה בודדת בשורה! מינימום 2 מילים בכל שורה תמיד. זה חל על כותרות וטקסט גוף. אם כותרת היא מילה אחת — חובה להוסיף מילה (לדוגמה: "הכלי ChatGPT" במקום "ChatGPT"). גם בטקסט הגוף — כל משפט חייב להיות מספיק ארוך שלא תישאר מילה בודדת בסוף שורה. כתוב משפטים באורך 8-15 מילים.
-  - כותרות: בלי מקף בהתחלה, קצרות (3-5 מילים)
+  - כלל קריטי: כל כותרת חייבת להיות לפחות 2-4 מילים. אסור מילה בודדת! לדוגמה: במקום "בריאות" כתוב "יתרונות בריאותיים", במקום "אנרגיה" כתוב "שיפור האנרגיה". הכותרת חייבת להיות משפט קצר ומשמעותי, לא מילה אחת.
+  - כותרות: בלי מקף בהתחלה, בלי המילה "הכלי" בהתחלה, 2-5 מילים
   - התוכן חייב להיות מעניין, פרקטי ושימושי — לא גנרי
   - אם קיבלת נושא קצר — תמציא תוכן איכותי ורלוונטי על הנושא
   - אימוג'י ב-cover שמתאים לנושא
@@ -201,13 +201,9 @@ async function aiSplit(text: string, mode: string): Promise<SlideData[]> {
   }
   // Post-process: enforce min 2 words per line in headlines and body
   const slides = (parsed.slides as SlideData[]).map(s => {
-    // Fix single-word headlines — ensure every line has 2+ words
-    if (s.headline && s.type !== 'cover') {
-      const words = s.headline.trim().split(/\s+/)
-      if (words.length === 1 && words[0].length > 0) {
-        s.headline = `הכלי ${s.headline.trim()}`
-      }
-    }
+    // If headline is a single word, don't auto-fix with a generic prefix.
+    // The AI prompt should prevent this. If it still happens, leave it —
+    // better than "הכלי בריאות" which makes no sense.
     // Fix body text — ensure no sentence ends with a single short word
     // Also limit body to ~3 sentences to prevent overflow
     if (s.body) {
