@@ -12,28 +12,73 @@ interface SlideData {
 }
 
 // Rule-based fallback splitter (when no OpenAI key)
-function ruleBasedSplit(text: string): SlideData[] {
+function ruleBasedSplit(text: string, mode: string): SlideData[] {
   // Split by newlines first; if too few lines, also split by ". " (period-sentences)
   let lines = text.split('\n').map(l => l.trim()).filter(Boolean)
   if (lines.length <= 2) {
     // Try splitting by ". " or "." followed by space
-    lines = text.split(/\.\s+/).map(l => l.trim()).filter(Boolean)
+    const sentenceSplit = text.split(/\.\s+/).map(l => l.trim()).filter(Boolean)
+    if (sentenceSplit.length > lines.length) lines = sentenceSplit
   }
+  // Also try splitting by commas if still too few
+  if (lines.length <= 2) {
+    const commaSplit = text.split(/,\s*/).map(l => l.trim()).filter(Boolean)
+    if (commaSplit.length > lines.length) lines = commaSplit
+  }
+
   const slides: SlideData[] = []
 
-  // Cover slide from first line (truncate if too long)
+  // If only 1-2 short lines (topic mode / AI mode), create template slides the user can edit
+  if (lines.length <= 2 && text.length < 200) {
+    const topic = lines[0] || 'הקרוסלה שלי'
+    slides.push({
+      type: 'cover',
+      headline: topic.length > 60 ? topic.slice(0, 57) + '...' : topic,
+      subtitle: '',
+      emoji: '🚀',
+    })
+    // Generate 3 editable content slides as templates
+    slides.push({
+      type: 'content',
+      headline: 'נקודה ראשונה',
+      item_number: '1',
+      bullets: ['הוסיפו פרט ראשון', 'הוסיפו פרט שני', 'הוסיפו פרט שלישי'],
+    })
+    slides.push({
+      type: 'content',
+      headline: 'נקודה שנייה',
+      item_number: '2',
+      bullets: ['הוסיפו פרט ראשון', 'הוסיפו פרט שני', 'הוסיפו פרט שלישי'],
+    })
+    slides.push({
+      type: 'content',
+      headline: 'נקודה שלישית',
+      item_number: '3',
+      bullets: ['הוסיפו פרט ראשון', 'הוסיפו פרט שני', 'הוסיפו פרט שלישי'],
+    })
+    slides.push({
+      type: 'cta',
+      headline: 'רוצים עוד תוכן כזה?',
+      subtext: 'עקבו אחריי לעוד טיפים',
+      button_text: 'עקבו',
+      emoji: '👇',
+    })
+    return slides
+  }
+
+  // Cover slide from first line
   const coverHeadline = lines[0] || 'הקרוסלה שלי'
   slides.push({
     type: 'cover',
     headline: coverHeadline.length > 60 ? coverHeadline.slice(0, 57) + '...' : coverHeadline,
-    subtitle: lines.length > 1 ? '' : '',
+    subtitle: '',
     emoji: '🚀',
   })
 
-  // Content slides: each sentence is its own slide
+  // Content slides: each line/sentence is its own slide
   const contentLines = lines.slice(1)
   contentLines.forEach((line, i) => {
-    if (!line) return
+    if (!line || i >= 6) return
     // Try to split "Title - detail1, detail2" pattern
     const dashParts = line.split(' - ')
     if (dashParts.length >= 2) {
@@ -53,8 +98,6 @@ function ruleBasedSplit(text: string): SlideData[] {
         bullets: [],
       })
     }
-    // Max 6 content slides
-    if (i >= 5) return
   })
 
   // CTA slide
@@ -74,7 +117,7 @@ async function aiSplit(text: string, mode: string): Promise<SlideData[]> {
   const apiKey = process.env.OPENAI_API_KEY
   if (!apiKey) {
     console.log('[split-text] No OpenAI key, using rule-based splitter')
-    return ruleBasedSplit(text)
+    return ruleBasedSplit(text, mode)
   }
 
   const systemPrompt = `אתה מומחה ליצירת קרוסלות לאינסטגרם. המשימה שלך: לקחת טקסט ולהפוך אותו לקרוסלה.
