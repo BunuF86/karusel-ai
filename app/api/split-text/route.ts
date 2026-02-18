@@ -201,9 +201,12 @@ async function aiSplit(text: string, mode: string): Promise<SlideData[]> {
   }
   // Post-process: enforce min 2 words per line in headlines and body
   const slides = (parsed.slides as SlideData[]).map(s => {
-    // If headline is a single word, don't auto-fix with a generic prefix.
-    // The AI prompt should prevent this. If it still happens, leave it —
-    // better than "הכלי בריאות" which makes no sense.
+    // Body text: rewrite sentences to avoid orphan words
+    // Split body into ~equal length lines to prevent CSS from leaving a single word
+    if (s.body) {
+      // Remove line breaks — let CSS handle wrapping
+      s.body = s.body.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim()
+    }
     // Fix body text — ensure no sentence ends with a single short word
     // Also limit body to ~3 sentences to prevent overflow
     if (s.body) {
