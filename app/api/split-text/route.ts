@@ -191,6 +191,14 @@ async function aiSplit(text: string, mode: string): Promise<SlideData[]> {
   if (parsed.slides && parsed.slides.length > 0 && parsed.slides[0].type === 'cover') {
     parsed.slides[0].headline = text
   }
+  // Force CTA to always be a standard follow message
+  if (parsed.slides && parsed.slides.length > 0) {
+    const lastSlide = parsed.slides[parsed.slides.length - 1]
+    if (lastSlide.type === 'cta') {
+      lastSlide.headline = 'עקבו אחריי\nלעוד טיפים'
+      lastSlide.subtext = ''
+    }
+  }
   // Post-process: enforce min 2 words per line in headlines and body
   const slides = (parsed.slides as SlideData[]).map(s => {
     // Fix single-word headlines — ensure every line has 2+ words
