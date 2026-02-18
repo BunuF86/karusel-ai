@@ -653,7 +653,7 @@ function SlideCard({
   const typeLabels: Record<string, string> = {
     cover: 'כריכה',
     content: 'תוכן',
-    cta: 'CTA',
+    cta: 'קריאה לפעולה (שקופית אחרונה)',
   }
 
   return (
