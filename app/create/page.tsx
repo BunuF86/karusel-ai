@@ -3,15 +3,12 @@
 import { useState, useCallback } from 'react'
 import Link from 'next/link'
 
-// API base URL — set NEXT_PUBLIC_API_URL on Vercel to point to our server
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || ''
 
 const THEMES = [
-  { id: 'dark', name: 'כהה', color: '#1a1a2e' },
-  { id: 'peach', name: 'אפרסק', color: '#F2D4B8' },
-  { id: 'teal', name: 'טורקיז', color: '#3D9B8F' },
-  { id: 'navy', name: 'נייבי', color: '#1B2A4A' },
-  { id: 'sunset', name: 'שקיעה', color: '#FF6B35' },
+  { id: 'dark', name: 'כהה', color: '#1a1a2e', dot: '#E8C87A' },
+  { id: 'peach', name: 'אפרסק', color: '#F2D4B8', dot: '#C47A3B' },
+  { id: 'teal', name: 'טורקיז', color: '#1A5C55', dot: '#7CE4DA' },
 ]
 
 interface Slide {
@@ -96,7 +93,7 @@ export default function CreatePage() {
     }
   }, [slides, selectedTheme, handle])
 
-  const downloadAll = useCallback(async () => {
+  const downloadAll = useCallback(() => {
     if (!result) return
     result.slides.forEach((slide, i) => {
       const link = document.createElement('a')
@@ -107,28 +104,28 @@ export default function CreatePage() {
   }, [result])
 
   return (
-    <div className="min-h-screen bg-[#FFF0E0]">
+    <div className="min-h-screen bg-[#0D0D0D] text-white" dir="rtl">
 
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#FFF0E0]/90 backdrop-blur-md border-b border-black/5">
-        <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="text-lg font-bold tracking-tight text-[#111]">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/6 bg-[#0D0D0D]/80 backdrop-blur-xl">
+        <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
+          <Link href="/" className="text-base font-bold tracking-tight">
             Karusel<span className="text-[#F97316]">.ai</span>
           </Link>
 
-          {/* Step progress */}
-          <div className="flex items-center gap-2">
+          {/* Progress steps */}
+          <div className="flex items-center gap-1.5" dir="ltr">
             {[1, 2, 3].map(s => (
-              <div key={s} className="flex items-center gap-2">
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-                  step >= s
+              <div key={s} className="flex items-center gap-1.5">
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold transition-all ${
+                  step > s
                     ? 'bg-[#F97316] text-white'
-                    : 'bg-[#F3F4F6] text-[#9CA3AF]'
+                    : step === s
+                    ? 'border border-[#F97316] text-[#F97316] bg-transparent'
+                    : 'border border-white/15 text-white/25 bg-transparent'
                 }`}>{s}</div>
                 {s < 3 && (
-                  <div className={`w-8 h-0.5 rounded-full transition-all ${
-                    step > s ? 'bg-[#F97316]' : 'bg-[#E5E7EB]'
-                  }`} />
+                  <div className={`w-6 h-px transition-all ${step > s ? 'bg-[#F97316]' : 'bg-white/10'}`} />
                 )}
               </div>
             ))}
@@ -136,78 +133,80 @@ export default function CreatePage() {
         </div>
       </nav>
 
-      <div className="pt-28 pb-20 px-6 max-w-2xl mx-auto">
+      <div className="pt-24 pb-20 px-6 max-w-xl mx-auto">
 
-        {/* ── STEP 1: Enter content ── */}
+        {/* ── STEP 1 ── */}
         {step === 1 && (
-          <div className="animate-fade-in">
-            <h1 className="text-3xl font-black text-[#111] mb-1">הכניסו את התוכן</h1>
-            <p className="text-[#6B7280] mb-8">הדביקו טקסט או הכניסו נושא לקרוסלה</p>
+          <div>
+            <div className="mb-8">
+              <h1 className="text-2xl font-bold text-white mb-1">הכניסו תוכן</h1>
+              <p className="text-white/40 text-sm">טקסט מוכן או נושא לכתיבה</p>
+            </div>
 
             {/* Mode toggle */}
-            <div className="flex gap-1 p-1 bg-[#F3F4F6] rounded-full w-fit mb-8">
+            <div className="flex gap-1 p-1 bg-white/5 rounded-full w-fit mb-6 border border-white/8">
               <button
                 onClick={() => setMode('text')}
-                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
                   mode === 'text'
-                    ? 'bg-[#FFF8F0] text-[#111] shadow-sm'
-                    : 'text-[#6B7280] hover:text-[#111]'
+                    ? 'bg-white/10 text-white'
+                    : 'text-white/40 hover:text-white/70'
                 }`}
               >
-                הכנס טקסט
+                טקסט מוכן
               </button>
               <button
                 onClick={() => setMode('ai')}
-                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
                   mode === 'ai'
-                    ? 'bg-[#FFF8F0] text-[#111] shadow-sm'
-                    : 'text-[#6B7280] hover:text-[#111]'
+                    ? 'bg-white/10 text-white'
+                    : 'text-white/40 hover:text-white/70'
                 }`}
               >
-                ✨ AI יכתוב בשבילי
+                ✨ AI יכתוב
               </button>
             </div>
 
             {mode === 'text' ? (
               <div>
-                <label className="block text-sm font-medium text-[#374151] mb-2">הטקסט שלך</label>
                 <textarea
                   value={rawText}
                   onChange={e => setRawText(e.target.value)}
-                  placeholder="הדביקו כאן נושא לקרוסלה — ה-AI יפרק אותו לשקופיות חכמות.&#10;&#10;לדוגמה: '5 כלי AI שכל יזם חייב להכיר: ChatGPT לכתיבת תוכן, Midjourney לתמונות...'"
-                  className="w-full h-44 bg-[#FFF8F0] border border-black/10 rounded-2xl p-4 text-[#111] placeholder-[#9CA3AF] resize-none focus:outline-none focus:border-[#F97316] text-base leading-relaxed transition-colors"
+                  placeholder="הדביקו כאן טקסט — ה-AI יפרק לשקופיות חכמות.&#10;&#10;לדוגמה: '5 כלי AI שכל יזם חייב להכיר...'"
+                  className="w-full h-44 bg-white/4 border border-white/8 rounded-xl p-4 text-white placeholder-white/25 resize-none focus:outline-none focus:border-[#F97316]/50 text-sm leading-relaxed transition-colors"
                   dir="rtl"
                 />
-                <div className="text-xs text-[#9CA3AF] mt-2 text-left">{rawText.length} תווים</div>
+                <div className="text-[11px] text-white/25 mt-1.5 text-left" dir="ltr">{rawText.length}</div>
               </div>
             ) : (
               <div>
-                <label className="block text-sm font-medium text-[#374151] mb-2">נושא הקרוסלה</label>
                 <input
                   value={aiTopic}
                   onChange={e => setAiTopic(e.target.value)}
                   placeholder="לדוגמה: 5 טיפים לשיווק ברשתות חברתיות"
-                  className="w-full bg-[#FFF8F0] border border-black/10 rounded-2xl p-4 text-[#111] placeholder-[#9CA3AF] focus:outline-none focus:border-[#F97316] text-base transition-colors"
+                  className="w-full bg-white/4 border border-white/8 rounded-xl p-4 text-white placeholder-white/25 focus:outline-none focus:border-[#F97316]/50 text-sm transition-colors"
                   dir="rtl"
                 />
-                <p className="text-xs text-[#9CA3AF] mt-2">ה-AI יכתוב קרוסלה שלמה על הנושא הזה</p>
+                <p className="text-[11px] text-white/25 mt-1.5">ה-AI יכתוב קרוסלה שלמה על הנושא</p>
               </div>
             )}
 
             {/* Handle */}
             <div className="mt-5">
-              <label className="block text-sm font-medium text-[#374151] mb-2">הידית שלך <span className="text-[#9CA3AF] font-normal">(אופציונלי)</span></label>
+              <label className="block text-xs font-medium text-white/40 mb-2">
+                ידית אינסטגרם <span className="text-white/20">(אופציונלי)</span>
+              </label>
               <input
                 value={handle}
                 onChange={e => setHandle(e.target.value)}
                 placeholder="@username"
-                className="w-full bg-[#FFF8F0] border border-black/10 rounded-2xl p-4 text-[#111] placeholder-[#9CA3AF] focus:outline-none focus:border-[#F97316] text-base transition-colors"
+                className="w-full bg-white/4 border border-white/8 rounded-xl p-3 text-white placeholder-white/25 focus:outline-none focus:border-[#F97316]/50 text-sm transition-colors"
                 dir="ltr"
               />
             </div>
 
             {error && (
-              <div className="mt-5 bg-red-50 border border-red-200 rounded-2xl p-4 text-red-600 text-sm">
+              <div className="mt-5 bg-red-950/50 border border-red-800/50 rounded-xl p-4 text-red-400 text-sm">
                 {error}
               </div>
             )}
@@ -215,51 +214,51 @@ export default function CreatePage() {
             <button
               onClick={splitText}
               disabled={isSplitting || (mode === 'text' ? !rawText.trim() : !aiTopic.trim())}
-              className="mt-8 w-full bg-[#F97316] hover:bg-[#EA580C] text-white font-bold py-4 rounded-full text-base disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+              className="mt-8 w-full bg-[#F97316] hover:bg-[#EA580C] text-white font-bold py-3.5 rounded-full text-sm disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
             >
               {isSplitting ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   מפרק לשקופיות...
                 </>
               ) : (
-                'המשך לעיצוב →'
+                'המשך →'
               )}
             </button>
           </div>
         )}
 
-        {/* ── STEP 2: Choose theme + review ── */}
+        {/* ── STEP 2 ── */}
         {step === 2 && slides && (
-          <div className="animate-fade-in">
+          <div>
             <div className="flex items-center justify-between mb-8">
               <div>
-                <h1 className="text-3xl font-black text-[#111] mb-1">בחרו סגנון</h1>
-                <p className="text-[#6B7280]">סקרו את השקופיות ובחרו עיצוב</p>
+                <h1 className="text-2xl font-bold text-white mb-1">בחרו סגנון</h1>
+                <p className="text-white/40 text-sm">{slides.length} שקופיות</p>
               </div>
               <button
                 onClick={() => setStep(1)}
-                className="text-[#6B7280] hover:text-[#111] text-sm font-medium transition-colors flex items-center gap-1"
+                className="text-white/30 hover:text-white/60 text-sm transition-colors"
               >
-                → חזרה
+                ← חזרה
               </button>
             </div>
 
-            {/* Theme selector — clean color swatches */}
-            <div className="flex gap-2 flex-wrap mb-8">
+            {/* Theme selector */}
+            <div className="flex gap-2 mb-8">
               {THEMES.map(theme => (
                 <button
                   key={theme.id}
                   onClick={() => setSelectedTheme(theme.id)}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold transition-all border ${
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all border ${
                     selectedTheme === theme.id
-                      ? 'border-[#F97316] bg-[#FFEDD5] text-[#9A3412]'
-                      : 'border-black/8 bg-[#FFF8F0] text-[#374151] hover:border-black/20'
+                      ? 'border-[#F97316] bg-[#F97316]/10 text-white'
+                      : 'border-white/8 bg-white/4 text-white/50 hover:border-white/20 hover:text-white/80'
                   }`}
                 >
                   <span
-                    className="w-3.5 h-3.5 rounded-full flex-shrink-0"
-                    style={{ background: theme.color }}
+                    className="w-3 h-3 rounded-full flex-shrink-0"
+                    style={{ background: theme.color, border: '1px solid rgba(255,255,255,0.1)' }}
                   />
                   {theme.name}
                 </button>
@@ -267,7 +266,7 @@ export default function CreatePage() {
             </div>
 
             {/* Slides list */}
-            <div className="space-y-3 mb-8 max-h-[45vh] overflow-y-auto">
+            <div className="space-y-2 mb-8 max-h-[50vh] overflow-y-auto pr-1">
               {slides.map((slide, i) => (
                 <SlideCard
                   key={i}
@@ -284,7 +283,7 @@ export default function CreatePage() {
             </div>
 
             {error && (
-              <div className="mb-5 bg-red-50 border border-red-200 rounded-2xl p-4 text-red-600 text-sm">
+              <div className="mb-5 bg-red-950/50 border border-red-800/50 rounded-xl p-4 text-red-400 text-sm">
                 {error}
               </div>
             )}
@@ -292,12 +291,12 @@ export default function CreatePage() {
             <button
               onClick={generate}
               disabled={isGenerating}
-              className="w-full bg-[#F97316] hover:bg-[#EA580C] text-white font-bold py-4 rounded-full text-base disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+              className="w-full bg-[#F97316] hover:bg-[#EA580C] text-white font-bold py-3.5 rounded-full text-sm disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
             >
               {isGenerating ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                  יוצר תמונות... (10–30 שניות)
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  יוצר תמונות... (כ-30 שניות)
                 </>
               ) : (
                 'צור קרוסלה →'
@@ -306,25 +305,25 @@ export default function CreatePage() {
           </div>
         )}
 
-        {/* ── STEP 3: Download ── */}
+        {/* ── STEP 3 ── */}
         {step === 3 && result && (
-          <div className="animate-fade-in">
+          <div>
             <div className="text-center mb-10">
-              <div className="w-16 h-16 bg-[#FFEDD5] rounded-full flex items-center justify-center mx-auto mb-5">
-                <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="#F97316" strokeWidth="2">
+              <div className="w-12 h-12 bg-[#F97316]/15 border border-[#F97316]/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#F97316" strokeWidth="2.5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                 </svg>
               </div>
-              <h1 className="text-3xl font-black text-[#111] mb-2">הקרוסלה מוכנה!</h1>
-              <p className="text-[#6B7280]">{result.count} שקופיות מוכנות להורדה</p>
+              <h1 className="text-2xl font-bold text-white mb-1">מוכן להורדה</h1>
+              <p className="text-white/40 text-sm">{result.count} שקופיות</p>
             </div>
 
             {/* Preview grid */}
-            <div className="grid grid-cols-3 gap-3 mb-8">
+            <div className="grid grid-cols-3 gap-2 mb-8">
               {result.slides.map((slide, i) => (
                 <div
                   key={i}
-                  className="aspect-square rounded-2xl overflow-hidden border border-black/8 relative group cursor-pointer bg-[#FFF8F0] shadow-sm"
+                  className="aspect-square rounded-xl overflow-hidden relative group cursor-pointer border border-white/6"
                   onClick={() => {
                     const link = document.createElement('a')
                     link.href = slide.dataUrl
@@ -333,23 +332,24 @@ export default function CreatePage() {
                   }}
                 >
                   <img src={slide.dataUrl} alt={`שקופית ${i + 1}`} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <span className="text-white text-xs font-bold bg-black/50 px-2 py-1 rounded-full">הורד</span>
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="white" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                    </svg>
                   </div>
-                  <div className="absolute bottom-2 right-2 bg-[#FFF8F0]/90 text-[#111] text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                  <div className="absolute bottom-1.5 right-1.5 bg-black/50 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">
                     {i + 1}
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* Actions */}
             <div className="flex gap-3">
               <button
                 onClick={downloadAll}
-                className="flex-1 bg-[#F97316] hover:bg-[#EA580C] text-white font-bold py-4 rounded-full text-base transition-colors"
+                className="flex-1 bg-[#F97316] hover:bg-[#EA580C] text-white font-bold py-3.5 rounded-full text-sm transition-colors"
               >
-                הורד את כל התמונות
+                הורד הכל
               </button>
               <button
                 onClick={() => {
@@ -359,9 +359,9 @@ export default function CreatePage() {
                   setRawText('')
                   setAiTopic('')
                 }}
-                className="flex-shrink-0 bg-[#FFF8F0] border border-black/10 text-[#374151] font-semibold py-4 px-6 rounded-full text-base hover:bg-[#F9FAFB] transition-colors"
+                className="flex-shrink-0 bg-white/5 border border-white/8 text-white/60 font-medium py-3.5 px-5 rounded-full text-sm hover:bg-white/8 hover:text-white/80 transition-colors"
               >
-                קרוסלה חדשה
+                חדש
               </button>
             </div>
           </div>
@@ -390,18 +390,18 @@ function SlideCard({
   }
 
   return (
-    <div className="bg-[#FFF8F0] border border-black/8 rounded-2xl p-4 shadow-sm">
+    <div className="bg-white/3 border border-white/6 rounded-xl p-4 hover:border-white/12 transition-colors">
       <div className="flex items-center gap-2 mb-3">
-        <span className="text-xs font-bold text-[#F97316] bg-[#FFEDD5] px-2 py-0.5 rounded-full">
+        <span className="text-[10px] font-bold text-[#F97316] bg-[#F97316]/10 px-2 py-0.5 rounded-full">
           {index + 1}/{total}
         </span>
-        <span className="text-xs text-[#9CA3AF]">{typeLabels[slide.type] || slide.type}</span>
+        <span className="text-[10px] text-white/30">{typeLabels[slide.type] || slide.type}</span>
       </div>
 
       <input
         value={slide.headline}
         onChange={e => onChange({ ...slide, headline: e.target.value })}
-        className="w-full text-[#111] font-bold text-base border-b border-black/8 pb-2 mb-2 focus:outline-none focus:border-[#F97316] bg-transparent transition-colors"
+        className="w-full text-white font-semibold text-sm border-b border-white/8 pb-2 mb-2 focus:outline-none focus:border-[#F97316]/40 bg-transparent transition-colors placeholder-white/20"
         placeholder="כותרת"
         dir="rtl"
       />
@@ -410,7 +410,7 @@ function SlideCard({
         <input
           value={slide.subtitle || ''}
           onChange={e => onChange({ ...slide, subtitle: e.target.value })}
-          className="w-full text-[#6B7280] text-sm border-b border-black/5 pb-2 mb-2 focus:outline-none focus:border-[#F97316] bg-transparent transition-colors"
+          className="w-full text-white/50 text-xs border-b border-white/5 pb-2 mb-2 focus:outline-none focus:border-[#F97316]/30 bg-transparent transition-colors placeholder-white/15"
           placeholder="כיתוב משנה"
           dir="rtl"
         />
@@ -427,8 +427,8 @@ function SlideCard({
                 newBullets[bi] = e.target.value
                 onChange({ ...slide, bullets: newBullets })
               }}
-              className="w-full text-[#374151] text-sm border-b border-black/5 pb-1 focus:outline-none focus:border-[#F97316] bg-transparent transition-colors"
-              placeholder={`• נקודה ${bi + 1}`}
+              className="w-full text-white/60 text-xs border-b border-white/5 pb-1 focus:outline-none focus:border-[#F97316]/30 bg-transparent transition-colors placeholder-white/15"
+              placeholder={`• פרט ${bi + 1}`}
               dir="rtl"
             />
           ))}
@@ -439,7 +439,7 @@ function SlideCard({
         <input
           value={slide.subtext || ''}
           onChange={e => onChange({ ...slide, subtext: e.target.value })}
-          className="w-full text-[#6B7280] text-sm border-b border-black/5 pb-2 focus:outline-none focus:border-[#F97316] bg-transparent transition-colors"
+          className="w-full text-white/50 text-xs border-b border-white/5 pb-2 focus:outline-none focus:border-[#F97316]/30 bg-transparent transition-colors placeholder-white/15"
           placeholder="טקסט נוסף"
           dir="rtl"
         />
