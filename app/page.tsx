@@ -2,6 +2,19 @@
 
 import Link from 'next/link'
 
+const ALL_THEMES = [
+  { name: 'כהה',     gradient: 'linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%)', textColor: '#fff',     accent: '#E8C87A' },
+  { name: 'אפרסק',  gradient: '#F2D4B8',                                              textColor: '#2a1a0a',  accent: '#C47A3B' },
+  { name: 'טורקיז', gradient: '#3D9B8F',                                              textColor: '#fff',     accent: '#7CE4DA' },
+  { name: 'אוקיינוס', gradient: 'linear-gradient(135deg, #0C2D48 0%, #2E8BC0 100%)', textColor: '#fff',   accent: '#7ECEF4' },
+  { name: 'סגול',   gradient: 'linear-gradient(135deg, #2D1B69 0%, #9B59B6 100%)',   textColor: '#fff',     accent: '#D7A4FF' },
+  { name: 'יער',    gradient: 'linear-gradient(135deg, #1B4332 0%, #40916C 100%)',   textColor: '#fff',     accent: '#95D5B2' },
+  { name: 'זריחה',  gradient: 'linear-gradient(135deg, #FF6B35 0%, #FFE8D6 100%)',   textColor: '#2a1a0a',  accent: '#FF6B35' },
+  { name: 'מונו',   gradient: '#FFFFFF',                                               textColor: '#111',     accent: '#111', border: true },
+  { name: 'יין',    gradient: 'linear-gradient(135deg, #2C0735 0%, #9B2335 100%)',   textColor: '#fff',     accent: '#E8A0A8' },
+  { name: 'ארקטי',  gradient: 'linear-gradient(135deg, #E8F4FD 0%, #7FB3D3 100%)',  textColor: '#1a2a3a',  accent: '#2E6DA0' },
+]
+
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-[#0D0D0D] text-white" dir="rtl">
@@ -55,48 +68,52 @@ export default function HomePage() {
         <div className="h-px bg-gradient-to-l from-transparent via-white/10 to-transparent" />
       </div>
 
-      {/* Themes section */}
+      {/* Themes section — 10 themes in 5×2 grid */}
       <section className="py-20 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-2xl font-bold text-white mb-2">3 סגנונות עיצוב מקצועיים</h2>
+            <h2 className="text-2xl font-bold text-white mb-2">10 סגנונות עיצוב מקצועיים</h2>
             <p className="text-white/40 text-sm">כל קרוסלה נראית כאילו עיצב אותה גרפיקאי</p>
           </div>
 
-          <div className="grid grid-cols-3 gap-4 max-w-2xl mx-auto">
-            {[
-              { name: 'כהה', bg: '#1a1a2e', accent: '#E8C87A', text: 'white', desc: 'קלאסי ומקצועי' },
-              { name: 'אפרסק', bg: '#F2D4B8', accent: '#C47A3B', text: '#2a1a0a', desc: 'חם ואנושי' },
-              { name: 'טורקיז', bg: '#1A5C55', accent: '#7CE4DA', text: 'white', desc: 'רענן ומודרני' },
-            ].map((s) => (
+          <div className="grid grid-cols-5 gap-3 max-w-3xl mx-auto">
+            {ALL_THEMES.map((s) => (
               <Link
                 key={s.name}
                 href="/create"
-                className="group relative rounded-2xl overflow-hidden aspect-square border border-white/8 hover:border-[#F97316]/40 transition-all cursor-pointer"
-                style={{ background: s.bg }}
+                className="group relative rounded-2xl overflow-hidden aspect-square border hover:border-[#F97316]/40 transition-all cursor-pointer"
+                style={{
+                  background: s.gradient,
+                  borderColor: s.border ? '#ccc' : 'rgba(255,255,255,0.08)',
+                }}
               >
                 {/* Mini slide mockup */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center">
+                <div className="absolute inset-0 flex flex-col items-center justify-center p-3 text-center">
                   <div
-                    className="text-xs font-black leading-tight mb-2"
-                    style={{ color: s.text, fontSize: '11px', lineHeight: '1.3' }}
+                    className="font-black leading-tight mb-1.5"
+                    style={{ color: s.textColor, fontSize: '10px', lineHeight: '1.3' }}
                   >
                     כותרת<br />ראשית
                   </div>
                   <div
-                    className="w-8 h-0.5 rounded-full mb-2"
+                    className="w-6 h-0.5 rounded-full mb-1.5"
                     style={{ background: s.accent }}
                   />
                   <div
-                    className="text-[8px] opacity-60"
-                    style={{ color: s.text }}
+                    className="opacity-60 leading-snug"
+                    style={{ color: s.textColor, fontSize: '7px' }}
                   >
                     • פרט ראשון<br />• פרט שני
                   </div>
                 </div>
                 {/* Label */}
-                <div className="absolute bottom-2 left-0 right-0 text-center">
-                  <span className="text-[10px] font-semibold" style={{ color: s.accent }}>
+                <div className="absolute bottom-0 left-0 right-0 text-center py-1"
+                  style={{
+                    background: 'rgba(0,0,0,0.4)',
+                    backdropFilter: 'blur(4px)',
+                  }}
+                >
+                  <span style={{ fontSize: '9px', fontWeight: 600, color: '#fff' }}>
                     {s.name}
                   </span>
                 </div>
@@ -112,7 +129,7 @@ export default function HomePage() {
         <div className="h-px bg-gradient-to-l from-transparent via-white/10 to-transparent" />
       </div>
 
-      {/* How it works — minimal, not template-y */}
+      {/* How it works */}
       <section className="py-20 px-6">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-2xl font-bold text-white mb-12 text-center">איך זה עובד</h2>
@@ -126,8 +143,8 @@ export default function HomePage() {
               },
               {
                 step: '2',
-                title: 'בחרו סגנון',
-                body: 'בחרו מתוך שלושה עיצובים מוכנים. כל עיצוב נבנה במיוחד לאינסטגרם בעברית.',
+                title: 'בחרו סגנון ותמונה',
+                body: 'בחרו מ-10 עיצובים מוכנים. אפשר להוסיף תמונה, לוגו, או אימוג׳י אישי.',
               },
               {
                 step: '3',
@@ -146,7 +163,7 @@ export default function HomePage() {
                   )}
                 </div>
                 {/* Right column: content */}
-                <div className={`pb-10 flex-1 ${i < arr.length - 1 ? '' : ''}`}>
+                <div className="pb-10 flex-1">
                   <h3 className="font-semibold text-white text-base mb-1">{item.title}</h3>
                   <p className="text-white/40 text-sm leading-relaxed">{item.body}</p>
                 </div>

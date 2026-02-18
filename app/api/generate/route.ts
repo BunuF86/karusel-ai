@@ -26,18 +26,27 @@ export async function POST(req: NextRequest) {
 
     const theme = body.theme || 'dark'
     const title = body.title || 'carousel'
-    console.log(`[generate] theme=${theme} slides=${body.slides.length}`)
+    const avatar = body.avatar || null           // base64 data URI of uploaded image
+    const avatarPlacement = body.avatarPlacement || null  // top / bottom / side
+    console.log(`[generate] theme=${theme} slides=${body.slides.length} avatar=${!!avatar}`)
 
     // Create temp dir
     tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'karusel-'))
     const inputFile = path.join(tmpDir, 'input.json')
 
     // Write input JSON
-    const inputData = {
+    const inputData: Record<string, unknown> = {
       title,
       theme,
       slides: body.slides,
     }
+    if (avatar) {
+      inputData.avatar = avatar
+    }
+    if (avatarPlacement) {
+      inputData.avatar_placement = avatarPlacement
+    }
+
     await fs.writeFile(inputFile, JSON.stringify(inputData, null, 2), 'utf-8')
 
     const startTime = Date.now()
